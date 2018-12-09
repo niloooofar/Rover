@@ -7,11 +7,19 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
+import java.util.concurrent.TimeUnit;
+
 import example.com.a2dgame.models.RoverSetting;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private MarsSurfaceThread thread;
+    public static final long GAME_STEP_INTERVAL = 800L;
+
     private RoverSetting roverSetting;
     private RoverSprite roverSprite;
     private WeirsSprite weirsSprite;
@@ -20,10 +28,11 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
     private Background background;
     private Handler mainHandler;
 
+    private Disposable disposable;
+
     public MarsView(Context context, RoverSetting roverSetting) {
         super(context);
         getHolder().addCallback(this);
-        thread = new MarsSurfaceThread(getHolder(), this);
         setFocusable(true);
         this.roverSetting = roverSetting;
         soundPlayer = new SoundPlayer(context);
@@ -31,16 +40,25 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
         mainHandler = new Handler(context.getMainLooper());
     }
 
-    public MarsView(Context context) {
-        super(context);
-    }
-
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void surfaceCreated(final SurfaceHolder holder) {
         roverSprite = new RoverSprite(getContext(), this.roverSetting.getStartPoint(), this.roverSetting.getWeirs());
         weirsSprite = new WeirsSprite(getContext(), this.roverSetting.getWeirs());
-        thread.setRunning(true);
-        thread.start();
+
+        disposable = Observable.interval(GAME_STEP_INTERVAL, TimeUnit.MILLISECONDS)
+                .doOnNext(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) {
+                        Canvas canvas = holder.lockCanvas();
+                        update();
+                        draw(canvas);
+                        holder.unlockCanvasAndPost(canvas);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+
     }
 
     @Override
@@ -49,25 +67,10 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        boolean retry = true;
-        while (retry) {
-            try {
-                thread.setRunning(false);
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            retry = false;
-        }
+        disposable.dispose();
     }
 
     public void update() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         roverSprite.update(new RoverSprite.OnEndListener() {
             @Override
             public void onHitCorners() {
