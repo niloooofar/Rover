@@ -13,12 +13,15 @@ import example.com.a2dgame.models.Point;
 
 public class WeirsSprite {
 
+    private static final int COLUMN_COUNT = 10;
+    private static final int ROW_COUNT = 20;
+
     private Bitmap image;
     private List<Point> points = new ArrayList<>();
     private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-    private int xLength = screenWidth / 10;
-    private int yLength = screenHeight / 20;
+    private int xLength = screenWidth / COLUMN_COUNT;
+    private int yLength = screenHeight / ROW_COUNT;
 
     public WeirsSprite(Context context, List<Point> points) {
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.red);

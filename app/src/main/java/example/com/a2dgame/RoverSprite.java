@@ -12,14 +12,16 @@ import example.com.a2dgame.models.Point;
 
 public class RoverSprite {
 
-    private OnEndListener onEndListener;
+    private static final int COLUMN_COUNT = 10;
+    private static final int ROW_COUNT = 20;
+
     private Bitmap image;
     private int x, y;
     private List<Point> weirPoints;
     private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-    private int xLength = screenWidth / 10;
-    private int yLength = screenHeight / 20;
+    private int xLength = screenWidth / COLUMN_COUNT;
+    private int yLength = screenHeight / ROW_COUNT;
 
     public RoverSprite(Context context, Point startingPoint, List<Point> weirPoints) {
         this.weirPoints = weirPoints;
@@ -44,6 +46,8 @@ public class RoverSprite {
             case 'R':
                 x += xLength;
                 break;
+            default:
+                break;
         }
         if ((x > screenWidth - image.getWidth()) || (x < 0)) {
             onEndListener.onHitCorners();
@@ -60,6 +64,7 @@ public class RoverSprite {
 
     public interface OnEndListener {
         void onHitCorners();
+
         void onHitWeirs();
     }
 }

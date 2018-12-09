@@ -8,10 +8,11 @@ import android.os.Build;
 
 public class SoundPlayer {
 
-    private AudioAttributes audioAttributes;
-    private final int SOUND_POOL_MAX = 1;
     private static SoundPool soundPool;
     private static int hitSound;
+
+    private AudioAttributes audioAttributes;
+    private final int SOUND_POOL_MAX = 1;
 
     public SoundPlayer(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -35,19 +36,3 @@ public class SoundPlayer {
         soundPool.play(hitSound, 1.0f, 1.0f, 1, 0, 1.0f);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

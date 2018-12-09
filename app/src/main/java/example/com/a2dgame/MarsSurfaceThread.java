@@ -3,17 +3,18 @@ package example.com.a2dgame;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
-public class MainThread extends Thread {
+public class MarsSurfaceThread extends Thread {
 
-    private SurfaceHolder surfaceHolder;
-    private MarsView gameView;
-    private boolean running;
     public static Canvas canvas;
 
-    public MainThread(SurfaceHolder surfaceHolder, MarsView gameView) {
+    private SurfaceHolder surfaceHolder;
+    private MarsView marsView;
+    private boolean running;
+
+    public MarsSurfaceThread(SurfaceHolder surfaceHolder, MarsView gameView) {
         super();
         this.surfaceHolder = surfaceHolder;
-        this.gameView = gameView;
+        this.marsView = gameView;
     }
 
     public void setRunning(boolean isRunning) {
@@ -27,8 +28,8 @@ public class MainThread extends Thread {
             try {
                 canvas = this.surfaceHolder.lockCanvas();
                 synchronized (surfaceHolder) {
-                    this.gameView.update();
-                    this.gameView.draw(canvas);
+                    this.marsView.update();
+                    this.marsView.draw(canvas);
                 }
             } catch (Exception e) {
             } finally {

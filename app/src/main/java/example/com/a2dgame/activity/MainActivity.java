@@ -1,6 +1,5 @@
 package example.com.a2dgame.activity;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -19,16 +18,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private ConstraintLayout noConnectionLayout;
     private Button btnRetry;
-    private Context context;
     private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-    private int xLength = screenWidth / 10;
-    private int yLength = screenHeight / 20;
+    private static final int COLUMN_COUNT = 10;
+    private static final int ROW_COUNT = 20;
+    private int xLength = screenWidth / COLUMN_COUNT;
+    private int yLength = screenHeight / ROW_COUNT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +42,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressBar = findViewById(R.id.progress_bar);
         noConnectionLayout = findViewById(R.id.no_connection_layout);
         btnRetry = findViewById(R.id.btn_retry);
-        btnRetry.setOnClickListener(this);
-        context = this;
+        btnRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Utitlity.isNetworkConnected(MainActivity.this)) {
+                    setContentView(R.layout.activity_main);
+                    getInfoFromServer();
+                }
+            }
+        });
     }
 
     private void getInfoFromServer() {
@@ -63,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFailure(Call<RoverSetting> call, Throwable t) {
                 progressBar.setVisibility(View.INVISIBLE);
-                if (!Utitlity.isNetworkConnected(context)) {
+                if (!Utitlity.isNetworkConnected(MainActivity.this)) {
                     noConnectionLayout.setVisibility(View.VISIBLE);
                 } else {
                     setContentView(R.layout.error_view);
@@ -72,13 +79,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.btn_retry) {
-            if (Utitlity.isNetworkConnected(context)) {
-                setContentView(R.layout.activity_main);
-                getInfoFromServer();
-            }
-        }
-    }
 }

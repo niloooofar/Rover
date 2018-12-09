@@ -11,24 +11,28 @@ import example.com.a2dgame.models.RoverSetting;
 
 public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private MainThread thread;
+    private MarsSurfaceThread thread;
     private RoverSetting roverSetting;
     private RoverSprite roverSprite;
     private WeirsSprite weirsSprite;
     private SoundPlayer soundPlayer;
-    private Context context;
-    private int i = 0;
+    private int commandIndex = 0;
     private Background background;
+    private Handler mainHandler;
 
     public MarsView(Context context, RoverSetting roverSetting) {
         super(context);
-        this.context = context;
         getHolder().addCallback(this);
-        thread = new MainThread(getHolder(), this);
+        thread = new MarsSurfaceThread(getHolder(), this);
         setFocusable(true);
         this.roverSetting = roverSetting;
         soundPlayer = new SoundPlayer(context);
         background = new Background();
+        mainHandler = new Handler(context.getMainLooper());
+    }
+
+    public MarsView(Context context) {
+        super(context);
     }
 
     @Override
@@ -59,7 +63,7 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void update() {
         try {
-            new Thread().sleep(500);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -68,33 +72,32 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
             @Override
             public void onHitCorners() {
                 soundPlayer.playHitSound();
-                Utitlity.vibrate(context);
-                showToastOnUi("Rover hitted the corners!");
+                Utitlity.vibrate(getContext());
+                showToastOnUi(getResources().getString(R.string.hit_corners_msg));
                 surfaceDestroyed(getHolder());
             }
 
             @Override
             public void onHitWeirs() {
                 soundPlayer.playHitSound();
-                Utitlity.vibrate(context);
-                showToastOnUi("Rover hitted the weirs!");
+                Utitlity.vibrate(getContext());
+                showToastOnUi(getResources().getString(R.string.hit_weirs_msg));
                 surfaceDestroyed(getHolder());
             }
-        }, roverSetting.getCommand().charAt(i));
+        }, roverSetting.getCommand().charAt(commandIndex));
 
-        i++;
-        if (i == roverSetting.getCommand().length()) {
-            showToastOnUi("No more commands!");
+        commandIndex++;
+        if (commandIndex == roverSetting.getCommand().length()) {
+            showToastOnUi(getResources().getString(R.string.no_more_commands));
             surfaceDestroyed(getHolder());
         }
     }
 
     private void showToastOnUi(final String showMessage) {
-        Handler mainHandler = new Handler(context.getMainLooper());
         Runnable myRunnable = new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(context, showMessage, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), showMessage, Toast.LENGTH_LONG).show();
             }
         };
         mainHandler.post(myRunnable);

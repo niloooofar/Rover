@@ -7,15 +7,18 @@ import android.graphics.Paint;
 
 public class Background {
 
+    private static final int COLUMN_COUNT = 10;
+    private static final int ROW_COUNT = 20;
+
     private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-    private int xLengthInt = screenWidth / 10;
-    private int yLengthInt = screenHeight / 20;
+    private int xLengthInt = screenWidth / COLUMN_COUNT;
+    private int yLengthInt = screenHeight / ROW_COUNT;
     private float xLength = (float) xLengthInt;
     private float yLength = (float) yLengthInt;
     private Paint paint;
 
-    float[] horizentalPts = {
+    private float[] horizentalPts = {
             0.0f,
             yLength,
             (float) screenWidth,
@@ -120,7 +123,7 @@ public class Background {
             20 * yLength,
     };
 
-    float[] verticalPts = {
+    private float[] verticalPts = {
             xLength,
             0.0f,
             xLength,

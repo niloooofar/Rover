@@ -14,6 +14,8 @@ import example.com.a2dgame.models.Point;
 
 public class Utitlity {
 
+    private static final int MILLI_SECONDS = 500;
+
     public static Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
         int width = bm.getWidth();
         int height = bm.getHeight();
@@ -48,9 +50,9 @@ public class Utitlity {
     public static void vibrate(Context context) {
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+            v.vibrate(VibrationEffect.createOneShot(MILLI_SECONDS, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
-            v.vibrate(500);
+            v.vibrate(MILLI_SECONDS);
         }
     }
 }

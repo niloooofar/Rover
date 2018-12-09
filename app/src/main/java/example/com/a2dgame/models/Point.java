@@ -1,15 +1,13 @@
 package example.com.a2dgame.models;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Point {
 
     @SerializedName("x")
-    @Expose
     private String x;
+
     @SerializedName("y")
-    @Expose
     private String y;
 
     public String getX() {
