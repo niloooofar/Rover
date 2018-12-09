@@ -18,6 +18,7 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
     private SoundPlayer soundPlayer;
     private Context context;
     private int i = 0;
+    private Background background;
 
     public MarsView(Context context, RoverSetting roverSetting) {
         super(context);
@@ -27,6 +28,7 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
         setFocusable(true);
         this.roverSetting = roverSetting;
         soundPlayer = new SoundPlayer(context);
+        background = new Background();
     }
 
     @Override
@@ -104,6 +106,7 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
         if (canvas != null) {
             roverSprite.draw(canvas);
             weirsSprite.draw(canvas);
+            background.draw(canvas);
         }
     }
 }
