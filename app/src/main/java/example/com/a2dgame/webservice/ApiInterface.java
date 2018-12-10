@@ -1,4 +1,4 @@
-package example.com.a2dgame.webService;
+package example.com.a2dgame.webservice;
 
 import example.com.a2dgame.models.RoverSetting;
 import retrofit2.Call;

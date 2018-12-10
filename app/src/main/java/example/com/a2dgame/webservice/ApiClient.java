@@ -1,4 +1,4 @@
-package example.com.a2dgame.webService;
+package example.com.a2dgame.webservice;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
