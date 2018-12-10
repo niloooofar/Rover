@@ -9,8 +9,8 @@ public class Background {
 
     private static final int COLUMN_COUNT = 10;
     private static final int ROW_COUNT = 20;
-    private static final int HORIZENTAL_PTS_COUNT = 80;
-    private static final int VERTICAL_PTS_COUNT = 40;
+    private static final int HORIZENTAL_PTS_COUNT = 76;
+    private static final int VERTICAL_PTS_COUNT = 36;
 
     private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
@@ -24,13 +24,10 @@ public class Background {
 
     private void generateHorizentalPts() {
         for (int i = 0; i < HORIZENTAL_PTS_COUNT; i++) {
-
             if (i % 4 == 0) {
                 horizentalPts[i] = 0.0f;
-
             } else if (i % 4 == 2) {
                 horizentalPts[i] = (float) screenWidth;
-
             } else {
                 horizentalPts[i] = (i / 4 + 1) * yLength;
             }
@@ -39,13 +36,10 @@ public class Background {
 
     private void generateVerticalPts() {
         for (int i = 0; i < VERTICAL_PTS_COUNT; i++) {
-
             if (i % 4 == 1) {
                 verticalPts[i] = 0.0f;
-
             } else if (i % 4 == 3) {
                 verticalPts[i] = (float) screenHeight;
-
             } else {
                 verticalPts[i] = (i / 4 + 1) * xLength;
             }
@@ -57,13 +51,10 @@ public class Background {
         generateVerticalPts();
         paint = new Paint();
         paint.setColor(Color.WHITE);
-        paint.setAntiAlias(true);
-        paint.setFilterBitmap(true);
     }
 
     public void draw(Canvas canvas) {
         canvas.drawLines(horizentalPts, paint);
         canvas.drawLines(verticalPts, paint);
-
     }
 }
