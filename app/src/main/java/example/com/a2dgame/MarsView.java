@@ -11,7 +11,8 @@ import example.com.a2dgame.models.RoverSetting;
 
 public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private MarsSurfaceThread thread;
+    public static final long GAME_STEP_INTERVAL = 800L;
+
     private RoverSetting roverSetting;
     private RoverSprite roverSprite;
     private WeirsSprite weirsSprite;
@@ -20,10 +21,23 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
     private Background background;
     private Handler mainHandler;
 
+    private volatile boolean stop = false;
+
+    private Runnable nextPositionRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (stop) return;
+            Canvas canvas = getHolder().lockCanvas();
+            update();
+            draw(canvas);
+            getHolder().unlockCanvasAndPost(canvas);
+            mainHandler.postDelayed(this, GAME_STEP_INTERVAL);
+        }
+    };
+
     public MarsView(Context context, RoverSetting roverSetting) {
         super(context);
         getHolder().addCallback(this);
-        thread = new MarsSurfaceThread(getHolder(), this);
         setFocusable(true);
         this.roverSetting = roverSetting;
         soundPlayer = new SoundPlayer(context);
@@ -31,16 +45,21 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
         mainHandler = new Handler(context.getMainLooper());
     }
 
-    public MarsView(Context context) {
-        super(context);
-    }
-
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void surfaceCreated(final SurfaceHolder holder) {
         roverSprite = new RoverSprite(getContext(), this.roverSetting.getStartPoint(), this.roverSetting.getWeirs());
         weirsSprite = new WeirsSprite(getContext(), this.roverSetting.getWeirs());
-        thread.setRunning(true);
-        thread.start();
+        startMoving();
+    }
+
+    private void startMoving() {
+        stop = false;
+        mainHandler.postDelayed(nextPositionRunnable, GAME_STEP_INTERVAL);
+    }
+
+    private void stopMoving() {
+        stop = true;
+        mainHandler.removeCallbacks(nextPositionRunnable);
     }
 
     @Override
@@ -49,58 +68,38 @@ public class MarsView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        boolean retry = true;
-        while (retry) {
-            try {
-                thread.setRunning(false);
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            retry = false;
-        }
+        stopMoving();
     }
 
     public void update() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         roverSprite.update(new RoverSprite.OnEndListener() {
             @Override
             public void onHitCorners() {
+                stopMoving();
                 soundPlayer.playHitSound();
                 Utitlity.vibrate(getContext());
-                showToastOnUi(getResources().getString(R.string.hit_corners_msg));
-                surfaceDestroyed(getHolder());
+                toast(getResources().getString(R.string.hit_corners_msg));
             }
 
             @Override
             public void onHitWeirs() {
+                stopMoving();
                 soundPlayer.playHitSound();
                 Utitlity.vibrate(getContext());
-                showToastOnUi(getResources().getString(R.string.hit_weirs_msg));
-                surfaceDestroyed(getHolder());
+                toast(getResources().getString(R.string.hit_weirs_msg));
             }
         }, roverSetting.getCommand().charAt(commandIndex));
 
         commandIndex++;
         if (commandIndex == roverSetting.getCommand().length()) {
-            showToastOnUi(getResources().getString(R.string.no_more_commands));
-            surfaceDestroyed(getHolder());
+            stopMoving();
+            toast(getResources().getString(R.string.no_more_commands));
+
         }
     }
 
-    private void showToastOnUi(final String showMessage) {
-        Runnable myRunnable = new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getContext(), showMessage, Toast.LENGTH_LONG).show();
-            }
-        };
-        mainHandler.post(myRunnable);
+    private void toast(final String showMessage) {
+        Toast.makeText(getContext(), showMessage, Toast.LENGTH_LONG).show();
     }
 
     @Override
